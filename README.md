@@ -102,6 +102,8 @@ arcade-flow/
 
 Developing ArcadeFlow provided practical experience in constructing a full-stack distributed system. Key learning outcomes include managing real-time data flow with WebSockets, structuring a scalable React Native codebase, integrating third-party APIs (Firebase, Google AI), and designing user-centric interfaces. The utilization of AI assistance throughout the development cycle demonstrated proficiency in modern tooling to optimize productivity and resolve complex debugging scenarios.
 
-## Credits
+## Contributions
 
+- **Backend Architecture & API Integration**: [Swapnil](https://github.com/swapnil5053)
 - **Frontend UI/UX Design**: [Phalak Bhandari](https://www.behance.net/phalakbhandari1)
+
