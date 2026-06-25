@@ -104,6 +104,6 @@ Developing ArcadeFlow provided practical experience in constructing a full-stack
 
 ## Contributions
 
-- **Backend Architecture & API Integration**: [Swapnil](https://github.com/swapnil5053)
 - **Frontend UI/UX Design**: [Phalak Bhandari](https://www.behance.net/phalakbhandari1)
+- **Backend Architecture & API Integration**: [Swapnil](https://github.com/swapnil5053)
 
