@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String?
+  displayName   String
+  avatarUrl     String?
+  level         Int      @default(1)
+  totalPoints   Int      @default(0)
+  oauthProvider String   @default("LOCAL")
+  oauthId       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  queuePositions     QueuePosition[]
+  scores             Score[]
+  sessions           Session[]
+  achievements       Achievement[]
+  notifications      Notification[]
+  favourites         Favourite[]
+  activityLogs       ActivityLog[]
+  friendships        Friendship[]       @relation("UserFriendships")
+  friendOf           Friendship[]       @relation("FriendOf")
+  refreshTokens      RefreshToken[]
+  adminUser          AdminUser?
+  recommendations    Recommendation[]
+  leaderboardEntries LeaderboardEntry[]
+
+  @@unique([oauthProvider, oauthId])
+  @@index([email])
+  @@map("users")
+}
+
+model GameCategory {
+  id    String  @id @default(uuid())
+  name  String  @unique
+  slug  String  @unique
+  icon  String?
+  games Game[]
+
+  @@map("game_categories")
+}
+
+model Game {
+  id               String       @id @default(uuid())
+  title            String
+  slug             String       @unique
+  description      String
+  imageUrl         String
+  categoryId       String
+  category         GameCategory @relation(fields: [categoryId], references: [id])
+  difficulty       String       // "EASY", "MEDIUM", "HARD"
+  rating           Float        @default(0)
+  avgScore         Float        @default(0)
+  currentPlayers   Int          @default(0)
+  estimatedWaitMin Int          @default(0)
+  crowdLevel       String       @default("MEDIUM") // "LOW", "MEDIUM", "HIGH"
+  queueCapacity    Int          @default(10)
+  mapX             Float?
+  mapY             Float?
+  isActive         Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  queue           Queue?
+  scores          Score[]
+  favourites      Favourite[]
+  leaderboards    Leaderboard[]
+  recommendations Recommendation[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([crowdLevel])
+  @@index([estimatedWaitMin])
+  @@index([isActive])
+  @@map("games")
+}
+
+model Queue {
+  id             String   @id @default(uuid())
+  gameId         String   @unique
+  game           Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  maxCapacity    Int      @default(10)
+  currentLength  Int      @default(0)
+  avgTurnMinutes Int      @default(5)
+  updatedAt      DateTime @updatedAt
+
+  positions QueuePosition[]
+
+  @@map("queues")
+}
+
+model QueuePosition {
+  id              String    @id @default(uuid())
+  queueId         String
+  queue           Queue     @relation(fields: [queueId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position        Int
+  status          String    @default("WAITING") // "WAITING", "CALLED", "PLAYING", "COMPLETED", "LEFT", "SKIPPED"
+  joinedAt        DateTime  @default(now())
+  estimatedTurnAt DateTime?
+  notifiedAt      DateTime?
+
+  @@unique([queueId, userId, status])
+  @@index([queueId, position])
+  @@index([userId, status])
+  @@map("queue_positions")
+}
+
+model Score {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameId         String
+  game           Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  sessionId      String?
+  session        Session? @relation(fields: [sessionId], references: [id])
+  value          Int
+  rank           Int?
+  isPersonalBest Boolean  @default(false)
+  playedAt       DateTime @default(now())
+
+  @@index([playedAt])
+  @@map("scores")
+}
+
+model Leaderboard {
+  id         String   @id @default(uuid())
+  gameId     String
+  game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  period     String   // "DAILY", "WEEKLY", "ALL_TIME"
+  computedAt DateTime @default(now())
+
+  entries LeaderboardEntry[]
+
+  @@unique([gameId, period])
+  @@map("leaderboards")
+}
+
+model LeaderboardEntry {
+  id            String      @id @default(uuid())
+  leaderboardId String
+  leaderboard   Leaderboard @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rank          Int
+  score         Int
+
+  @@unique([leaderboardId, userId])
+  @@index([leaderboardId, rank])
+  @@map("leaderboard_entries")
+}
+
+model Friendship {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserFriendships", fields: [userId], references: [id], onDelete: Cascade)
+  friendId  String
+  friend    User     @relation("FriendOf", fields: [friendId], references: [id], onDelete: Cascade)
+  status    String   @default("PENDING") // "PENDING", "ACCEPTED", "BLOCKED"
+  qrToken   String?  @unique
+  createdAt DateTime @default(now())
+
+  @@unique([userId, friendId])
+  @@index([userId, status])
+  @@map("friendships")
+}
+
+model Session {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startedAt    DateTime  @default(now())
+  endedAt      DateTime?
+  gamesPlayed  Int       @default(0)
+  bestScore    Int       @default(0)
+  totalMinutes Int       @default(0)
+
+  scores  Score[]
+  summary SessionSummary?
+
+  @@map("sessions")
+}
+
+model SessionSummary {
+  id          String   @id @default(uuid())
+  sessionId   String   @unique
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  aiSummary   String?
+  stats       String // JSON string
+  generatedAt DateTime @default(now())
+
+  @@map("session_summaries")
+}
+
+model Achievement {
+  id       String   @id @default(uuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type     String
+  badgeUrl String?
+  metadata String?  // JSON string
+  earnedAt DateTime @default(now())
+
+  @@unique([userId, type])
+  @@index([userId])
+  @@map("achievements")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // "QUEUE_TURN", "QUEUE_UPDATE", "ACHIEVEMENT", "FRIEND_REQUEST", "FRIEND_ACTIVITY", "SYSTEM"
+  payload   String   // JSON string
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model Favourite {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, gameId])
+  @@map("favourites")
+}
+
+model Recommendation {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  score     Float
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, gameId])
+  @@map("recommendations")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  metadata  String?  // JSON string
+  timestamp DateTime @default(now())
+
+  @@index([action])
+  @@map("activity_logs")
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String   @default("OPERATOR") // "SUPER_ADMIN", "OPERATOR", "ANALYST"
+  createdAt DateTime @default(now())
+
+  auditLogs AuditLog[]
+
+  @@map("admin_users")
+}
+
+model AuditLog {
+  id         String    @id @default(uuid())
+  adminId    String
+  admin      AdminUser @relation(fields: [adminId], references: [id])
+  action     String
+  entityType String
+  entityId   String
+  before     String?   // JSON string
+  after      String?   // JSON string
+  timestamp  DateTime  @default(now())
+
+  @@map("audit_logs")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
