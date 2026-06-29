@@ -1,7 +1,6 @@
 # PlayQ
 
-Digital queue management, live wait times, and an arcade floor map for physical arcades — built with React, Node.js, and Firebase.
-
+PlayQ replaces the physical arcade line with virtual queues, live wait times, and a floor map — accessible from your phone. Built with React, Node.js, and Firebase.
 ## About
 
 Arcades run on physical lines and guesswork — there's no way to know your wait time without standing in it, and no visibility into which machines are actually busy. PlayQ replaces that with software: live queue position, a map you can check before walking over, and score history you don't lose the moment you leave a machine.
