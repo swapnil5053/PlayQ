@@ -1,38 +1,76 @@
 # ArcadeFlow
 
-A mobile app that digitises the arcade floor experience: virtual queues instead of physical lines, live wait times, an interactive arcade map, score tracking, and a Gemini-powered in-app concierge. Built with React + Vite, packaged as a native Android/iOS app via Natively.io.
+Digital queue management, live wait times, and an arcade floor map for physical arcades — built with React, Node.js, and Firebase.
 
-**Problem:** Arcades run on physical lines and guesswork — no way to know your wait time without standing in it, no visibility into which machines are actually busy. ArcadeFlow turns that into data: live queue position, a map you can check before walking over, and score history you don't lose the moment you leave a machine.
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white&labelColor=20232a)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white&labelColor=20232a)
+![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white&labelColor=20232a)
+![Firebase](https://img.shields.io/badge/Firebase-Auth%20%2B%20Firestore-FFCA28?logo=firebase&logoColor=white&labelColor=20232a)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-realtime-010101?logo=socket.io&logoColor=white&labelColor=20232a)
+
+## About
+
+Arcades run on physical lines and guesswork — there's no way to know your wait time without standing in it, and no visibility into which machines are actually busy. ArcadeFlow replaces that with software: live queue position, a map you can check before walking over, and score history you don't lose the moment you leave a machine.
+
+The app is a React PWA packaged into a native Android/iOS shell via Natively.io, backed by an Express API.
+
+## Features
+
+- **Virtual queueing** — join a queue from your phone, see live position and estimated wait, get pushed updates over Socket.IO instead of polling.
+- **Arcade floor map** — interactive map of machines and zones, built on `react-leaflet` with a dark CartoDB tile set.
+- **Score tracking & leaderboards** — score history per player, per-game leaderboards, personal bests.
+- **AI concierge** — a Gemini-powered in-app chat that answers questions about games, wait times, and the arcade itself.
+- **Auth** — Firebase Authentication, with the rest of the app degrading gracefully to mock data if Firebase isn't configured.
 
 ## Tech stack
 
-**Frontend** (`apps/web`) — React 18, Vite, plain JavaScript. React Router v6 with lazy-loaded routes and `framer-motion` page transitions. Zustand for global state, React Query for server data (caching/refetch handled for free). CSS Modules + a single `tokens.css` design-token file — no Tailwind. `react-leaflet` with CartoDB dark tiles for the arcade map (no API key required).
+| Layer | Stack |
+|---|---|
+| Frontend | React 18, Vite, React Router v6, Zustand, React Query, CSS Modules, `react-leaflet` |
+| Backend | Node.js, Express, Socket.IO |
+| Data & Auth | Firebase Firestore, Firebase Authentication |
+| AI | Google Gemini API |
 
-**Backend** (`apps/api`) — Node.js/Express, Firebase Firestore for persistence, Firebase Auth for identity, Socket.IO for live queue position pushes (room-per-game, no polling). The concierge endpoint calls the Gemini API when a key is configured, otherwise falls back to a relevant canned response — the chat still works on a fresh checkout with zero keys set.
+**Why these:**
+- **Zustand over Redux** — global state is small (user, active game, queue, favourites, toasts); doesn't need the boilerplate.
+- **React Query** — leaderboards, score history, and game details are all server data with the same caching/refetch needs; solved once instead of per-screen.
+- **CSS Modules over Tailwind** — keeps the design system centralized in one `tokens.css` file instead of scattered utility classes.
+- **Socket.IO over polling** — queue position needs to feel live without wasting requests.
+- **react-leaflet + CartoDB over Google Maps/Mapbox** — no API key or billing account required to run the project.
 
-**Key decisions:**
-- Zustand over Redux — state here is small (user, active game, queue, favourites, toasts), doesn't need the boilerplate.
-- Socket.IO over polling — queue position needs to feel live without wasting requests.
-- react-leaflet/CartoDB over Google Maps/Mapbox — no API key or billing account needed for a demo.
-- Firebase optional at the code level — the app degrades to mock data if it's not configured, so it always runs.
+## Getting started
 
-## Local setup
+### Prerequisites
+- Node.js 18+
+- A Firebase project (optional — the app runs on mock data without one)
+- A Gemini API key (optional — the concierge falls back to canned responses without one)
+
+### Installation
 
 ```bash
+git clone https://github.com/swapnil5053/ArcadeFlow.git
+cd ArcadeFlow
 npm install -w apps/web
 npm install -w apps/api
 ```
-Run from the repo root — it's an npm workspaces monorepo, so workspace installs only work from there.
+
+> Run installs from the repo root — this is an npm workspaces monorepo, so workspace installs only work from there.
+
+### Configuration
 
 ```bash
 cp apps/web/.env.example apps/web/.env
 cp apps/api/.env.example apps/api/.env
 ```
-Fill in Firebase web config + `VITE_API_BASE_URL` in `apps/web/.env`, and `GEMINI_API_KEY` + Firebase Admin credentials in `apps/api/.env` (see `apps/api/firebase-service-account.json.example` for the expected shape). Without Firebase Admin set up, the frontend still runs on its built-in mock data.
+
+- `apps/web/.env` — Firebase web config (`VITE_FIREBASE_*`) and `VITE_API_BASE_URL` (defaults to `http://localhost:4000`)
+- `apps/api/.env` — `GEMINI_API_KEY` and Firebase Admin credentials (see `apps/api/firebase-service-account.json.example` for the expected shape)
+
+### Run locally
 
 ```bash
-cd apps/api && npm start    # :4000
-cd apps/web && npm run dev  # :3000
+cd apps/api && npm start    # API on :4000
+cd apps/web && npm run dev  # Web app on :3000
 ```
 
 ## Project structure
@@ -60,9 +98,12 @@ ArcadeFlow/
 
 ## Known limitations
 
-No automated test suite — verified manually plus a production `vite build`. Map "AR navigation" is a directional arrow + distance estimate, not camera-based AR. Queue position ticks down on a client-side timer rather than reflecting real players being served, since there's no real arcade hardware in the loop. Running the backend with no Firebase credentials means persisted data routes won't return anything real — by design, not a bug.
+- No automated test suite — verified manually plus a production `vite build`.
+- Map "AR navigation" is a directional arrow + distance estimate, not camera-based AR.
+- Queue position ticks down on a client-side timer rather than reflecting real players being served, since there's no real arcade hardware in the loop.
+- Running the backend with no Firebase credentials means persisted-data routes won't return anything real — by design, not a bug.
 
 ## Credits
 
-UI/UX design by [Phalak Bhandari](https://www.behance.net/phalakbhandari1) — user flows, wireframes, usability testing, design system.
-Engineering by [Swapnil](https://github.com/swapnil5053) — frontend architecture, backend API, real-time queue system, Firebase/Gemini integration.
+- UI/UX design — [Phalak Bhandari](https://www.behance.net/phalakbhandari1): user flows, wireframes, usability testing, design system.
+- Engineering — [Swapnil](https://github.com/swapnil5053): frontend architecture, backend API, real-time queue system, Firebase/Gemini integration.
