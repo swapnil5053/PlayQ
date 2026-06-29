@@ -1,10 +1,10 @@
-# ArcadeFlow
+# PlayQ
 
 Digital queue management, live wait times, and an arcade floor map for physical arcades — built with React, Node.js, and Firebase.
 
 ## About
 
-Arcades run on physical lines and guesswork — there's no way to know your wait time without standing in it, and no visibility into which machines are actually busy. ArcadeFlow replaces that with software: live queue position, a map you can check before walking over, and score history you don't lose the moment you leave a machine.
+Arcades run on physical lines and guesswork — there's no way to know your wait time without standing in it, and no visibility into which machines are actually busy. PlayQ replaces that with software: live queue position, a map you can check before walking over, and score history you don't lose the moment you leave a machine.
 
 The app is a React PWA packaged into a native Android/iOS shell via Natively.io, backed by an Express API.
 
@@ -42,8 +42,8 @@ The app is a React PWA packaged into a native Android/iOS shell via Natively.io,
 ### Installation
 
 ```bash
-git clone https://github.com/swapnil5053/ArcadeFlow.git
-cd ArcadeFlow
+git clone https://github.com/swapnil5053/PlayQ.git
+cd PlayQ
 npm install -w apps/web
 npm install -w apps/api
 ```
@@ -70,7 +70,7 @@ cd apps/web && npm run dev  # Web app on :3000
 ## Project structure
 
 ```text
-ArcadeFlow/
+PlayQ/
 ├── apps/
 │   ├── api/                 # Express backend
 │   │   └── src/
