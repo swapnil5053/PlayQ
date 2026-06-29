@@ -2,12 +2,6 @@
 
 Digital queue management, live wait times, and an arcade floor map for physical arcades — built with React, Node.js, and Firebase.
 
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white&labelColor=20232a)
-![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white&labelColor=20232a)
-![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white&labelColor=20232a)
-![Firebase](https://img.shields.io/badge/Firebase-Auth%20%2B%20Firestore-FFCA28?logo=firebase&logoColor=white&labelColor=20232a)
-![Socket.IO](https://img.shields.io/badge/Socket.IO-realtime-010101?logo=socket.io&logoColor=white&labelColor=20232a)
-
 ## About
 
 Arcades run on physical lines and guesswork — there's no way to know your wait time without standing in it, and no visibility into which machines are actually busy. ArcadeFlow replaces that with software: live queue position, a map you can check before walking over, and score history you don't lose the moment you leave a machine.
