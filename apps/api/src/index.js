@@ -1,6 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
+const { registerQueueHandlers } = require('./socket/queueHandler');
 
 // Routes
 const authRoutes = require('./routes/auth.routes');
@@ -27,7 +30,7 @@ app.use('/api/queue', queueRoutes);
 app.use('/api/scores', scoresRoutes);
 app.use('/api/concierge', conciergeRoutes);
 app.use('/api/session', sessionRoutes);
-// Today's high score routes are simple enough to include here or in a separate file. 
+// Today's high score routes are simple enough to include here or in a separate file.
 // We'll put them in scores for now, or a new file.
 const todaysHighScoreRoutes = require('./routes/todaysHighScore.routes');
 app.use('/api/today-high-score', todaysHighScoreRoutes);
@@ -36,6 +39,14 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'THE ARCADE API (Firebase) is running' });
 });
 
-app.listen(PORT, () => {
+// HTTP server + Socket.IO (additive -- existing REST routes above are untouched)
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: '*' },
+});
+registerQueueHandlers(io);
+
+server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
+  console.log('Socket.IO queue rooms active');
 });

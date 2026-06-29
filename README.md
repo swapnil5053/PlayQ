@@ -1,109 +1,92 @@
 # ArcadeFlow
 
-ArcadeFlow is a comprehensive mobile and web application designed to modernize the physical arcade experience. Built as my inaugural full-stack project, this application replaces traditional token-and-line systems with a digital infrastructure offering real-time virtual queueing, interactive mapping, and live session tracking. During the development process, AI-assisted coding tools were utilized to accelerate prototyping and implement complex architecture patterns, reflecting a modern approach to software engineering and rapid iteration.
+ArcadeFlow is a mobile application built with React and Vite, packaged as a native Android and iOS app via Natively.io. It digitises the physical arcade experience — replacing token systems and physical queues with virtual queue management, live score tracking, interactive maps, and a Gemini-powered in-app concierge.
 
-## Architecture and Technology Stack
+The app is built as a Progressive Web App wrapped in a native shell. The frontend is a single-page React application; the backend is a Node.js/Express server handling queue state via Socket.IO, score persistence via Firebase Firestore, and AI responses via the Gemini API.
 
-The project is structured as a monorepo, separating the client applications from the backend services to ensure scalability and maintainability.
+## Problem statement
 
-### Frontend (Mobile & Web)
-- **Frameworks**: React Native (Expo) for mobile, React 18 for web.
-- **Routing**: React Navigation (Mobile), TanStack Router (Web).
-- **State Management**: Zustand for global state, TanStack Query for server state.
-- **Styling**: React Native StyleSheet, Tailwind CSS (Web).
-- **Real-time Client**: Socket.IO Client.
+Arcades are a bad queueing experience by default. Lines form physically around whichever machine is popular, there's no way to know your wait time without standing in it, and operators have no visibility into which machines are actually busy versus just look busy. ArcadeFlow moves the queue into software: position and wait time become data the app can show and update in real time, the floor map becomes something you can check before walking over, and a player's history and rank become things they can look back on instead of losing the moment they walk away from a machine.
 
-### Backend (API)
-- **Runtime**: Node.js with Express.js.
-- **Database**: Firebase Firestore for cloud-native NoSQL data storage.
-- **Real-time Server**: Socket.IO for WebSocket connections.
-- **Authentication**: Firebase Authentication.
-- **Integrations**: Google Generative AI (Gemini) for the Virtual Concierge service.
+## Architecture
 
-## Use Case & Problem Statement
+The repo is an npm-workspaces monorepo with two apps under `apps/`: `web` (the frontend) and `api` (the backend). They communicate over plain REST plus a Socket.IO channel for queue position updates.
 
-**The Problem:** Traditional arcade venues suffer from high friction. Customers spend excessive time physically waiting in lines, managing physical tokens or tickets, and navigating chaotic, crowded spaces. For operators, there is limited real-time visibility into machine utilization, crowd bottlenecks, or player engagement.
+**Frontend -- `apps/web`.** React 18 on Vite, written in plain JavaScript (no TypeScript, no build-time type checking). Routing is React Router v6 with lazy-loaded screens and a `framer-motion`-driven page transition wrapper. Global app state -- current user, active game, queue state, favourites, toasts -- lives in a single Zustand store (`src/store/useAppStore.js`). Server data (game lists, leaderboards, score history) goes through React Query, which gives free caching and refetching without hand-rolled loading-state plumbing. Styling is CSS Modules exclusively; there's no Tailwind or styled-components in the project, so every component's classes live in a co-located `.module.css` file and the entire design system -- colors, spacing, type, radii, shadows -- is centralized as CSS variables in `src/theme/tokens.css`. The arcade floor map is `react-leaflet` over CartoDB's dark tile set, chosen specifically because it needs no API key and no billing account, which matters for a project meant to run with zero paid dependencies out of the box.
 
-**The Solution:** ArcadeFlow acts as a digital layer over the physical arcade. By allowing users to join virtual queues from their phones, track their progress in real-time, and locate available machines via interactive maps, the platform eliminates physical lines. Operators benefit from digitized metrics, and users enjoy a frictionless, gamified "theme park in your pocket" experience.
+**Backend -- `apps/api`.** Express, talking to Firebase Firestore for persistence and Firebase Auth (via ID tokens verified in middleware) for identifying users. The existing route files and the server entry point were treated as fixed: this rebuild only adds new files, it doesn't rewrite the auth, games, queue, scores, concierge, or session routes that were already there. The one change to `src/index.js` wraps the existing Express `app` in a raw `http.createServer` and attaches a Socket.IO server to it, so the queue screen can get pushed position updates (`queue:${gameId}` rooms) instead of polling. The Virtual Concierge endpoint calls Google's Gemini API when `GEMINI_API_KEY` is set, and falls back to a canned-but-relevant response when it isn't, so the chat feature still works in a fresh checkout with no keys configured.
 
-## Frontend Design Case Study
+**Why this split.** Keeping queue/score/auth logic entirely server-side (rather than, say, computing queue position client-side) means multiple devices joining the same queue stay consistent, and a future kiosk or admin view could read the same Firestore data without re-implementing client logic.
 
-During the UI/UX development phase, the frontend architecture underwent a significant case study in balancing functional utility with an engaging, arcade-style aesthetic.
-- **Initial Iteration:** The early UI relied heavily on generic components, standard border radii, and safe, muted color palettes. This led to user feedback that the app felt "sterile" or "made by AI."
-- **Design Evolution:** To resolve this, a bespoke design system was integrated via a centralized `theme.js` file. The interface shifted to a dynamic, neon-accented dark mode (`COLORS.background` mapped to deep purples/blacks, with vibrant `COLORS.accent` for CTAs).
-- **Interactive Elements:** Static lists were replaced with interactive, skeuomorphic-inspired cards. A custom `Hoverable` Higher-Order Component (HOC) was implemented to provide tactile micro-animations (scale and lift effects) when users interacted with game listings. 
-- **User Hub Overhaul:** The account settings page was reimagined into a "Player Hub," gamifying the experience by placing Wallet Balances, a Rewards Dashboard with progress tracking, and Achievement Badges front and center.
+## Technology choices
 
-## Core Features
+- **JavaScript over TypeScript:** the original codebase was TypeScript; this rebuild is intentionally plain JS per the project's spec, prioritizing speed of iteration on a project of this size over compile-time type safety.
+- **CSS Modules over Tailwind:** Tailwind is fast to write but tends to produce illegible class soup in JSX and makes a "design system" implicit in scattered utility classes. CSS Modules plus a single `tokens.css` keeps the design system in one place and keeps component markup readable.
+- **Zustand over Redux:** the global state here is small (current user, one active game, queue status, favourites, toasts) -- Zustand gives a single hook-based store without actions/reducers/boilerplate.
+- **React Query over hand-written fetch + useEffect:** leaderboards, score history, and game details are all server data with the same shape of problem (loading state, caching, refetch-on-stale). React Query solves that once instead of five times.
+- **Socket.IO over polling:** queue position needs to feel live. A short-interval poll would work but wastes requests; a room-per-game socket model pushes updates only when the room's occupancy actually changes.
+- **react-leaflet + CartoDB tiles over Google Maps/Mapbox:** no API key, no billing account, no quota to hit during a demo. The tradeoff is a less polished default basemap, addressed with the dark tile theme and custom marker icons.
+- **Firebase (Auth + Firestore) over a self-hosted database:** this was inherited from the existing backend and kept as-is -- it's the lowest-friction way to get auth and a document database running without provisioning infrastructure, and the app is written to degrade gracefully (mock data fallback) when Firebase isn't configured at all.
 
-- **Virtual Queue Management**: Players can join queues remotely via the application, receive real-time estimated wait times, and track their position dynamically without needing to physically stand in line.
-- **Interactive Arcade Map**: A visual representation of the arcade floor featuring live heat maps for crowd density and an augmented reality (AR) navigation prototype.
-- **Player Hub & Wallet**: A centralized dashboard tracking a user's arcade wallet balance, rewards progression, recent sessions, and unlockable achievements.
-- **Global Leaderboards**: Real-time per-game ranking systems allowing players to compare their statistics against top performers globally.
-- **Virtual Concierge**: An integrated support chat utilizing a tailored conversational model to assist users with navigation, queue management, and general inquiries.
+## Local setup
 
-## Local Development Setup
+From the repository root:
 
-### Prerequisites
-- Node.js (v20 or higher)
-- npm or yarn
-- Expo CLI
-- Firebase Project setup
-
-### Installation
-
-1. Clone the repository and install dependencies across the monorepo:
 ```bash
-npm install
+npm install -w apps/web
+npm install -w apps/api
 ```
 
-2. Configure environment variables. Create a `.env` file in both `apps/api` and `apps/mobile` containing your Firebase and API configurations:
+(Run `npm install` from the repo root, not from inside `apps/web` or `apps/api` directly -- the root `package.json` declares npm workspaces, and npm's workspace-aware install commands only work when invoked from the root.)
+
+Copy the environment templates and fill in real values where you have them:
+
 ```bash
+cp apps/web/.env.example apps/web/.env
 cp apps/api/.env.example apps/api/.env
-cp apps/mobile/.env.example apps/mobile/.env
 ```
 
-3. Start the backend API service:
+`apps/web/.env` takes Firebase web config (`VITE_FIREBASE_*`) and `VITE_API_BASE_URL`, which should point at wherever the API is running (`http://localhost:4000` by default). `apps/api/.env` takes `GEMINI_API_KEY` for the concierge and a few other values; without Firebase Admin credentials configured (see `apps/api/firebase-service-account.json.example` for the expected shape), the backend's Firestore-backed routes won't have anything to talk to, but the frontend will still run against its built-in mock data.
+
+Start both apps in separate terminals:
+
 ```bash
-cd apps/api
-npm start
+cd apps/api && npm start
+cd apps/web && npm run dev
 ```
 
-4. Start the frontend application (Mobile/Web):
-```bash
-cd apps/mobile
-npm run web
-```
-*Note: The frontend can also be run on iOS or Android simulators using `npm run ios` or `npm run android`.*
+The web app (Vite) runs on port 3000 and the API runs on port 4000 by default -- if you change one port, update `VITE_API_BASE_URL` in `apps/web/.env` to match.
 
-## Project Structure
+## Project structure
 
 ```text
-arcade-flow/
+ArcadeFlow/
 ├── apps/
-│   ├── api/                  # Express Node.js backend
-│   │   ├── src/
-│   │   │   ├── routes/       # API endpoints (Queue, AI, Games)
-│   │   │   ├── middleware/   # Authentication and validation
-│   │   │   └── index.js      # Server entry point
-│   │   └── package.json
-│   └── mobile/               # React Native (Expo) frontend
-│       ├── src/
-│       │   ├── components/   # Reusable UI components
-│       │   ├── navigation/   # React Navigation stacks
-│       │   ├── screens/      # Application views
-│       │   ├── services/     # API clients and Firebase config
-│       │   └── theme.js      # Global design system
-│       └── package.json
-└── package.json              # Monorepo root
+│   ├── api/                       # Express backend
+│   │   └── src/
+│   │       ├── routes/            # REST endpoints (auth, games, queue, scores, concierge, session)
+│   │       ├── middleware/        # verifyToken / verifyAdmin
+│   │       ├── services/          # firebaseAdmin init
+│   │       ├── socket/            # queueHandler.js -- Socket.IO room logic (new)
+│   │       └── index.js           # entry point (existing routes untouched, sockets added)
+│   └── web/                       # React + Vite frontend
+│       └── src/
+│           ├── theme/tokens.css   # design tokens (colors, spacing, type, shadows)
+│           ├── store/             # Zustand global store
+│           ├── services/          # api.js, firebase.js, gemini.js
+│           ├── data/              # mock data fallback
+│           ├── hooks/             # React Query hooks + queue socket hook
+│           ├── components/        # shared + primitive (Button, BottomSheet, Badge, NavBar...)
+│           ├── screens/           # one folder per screen, each with its .module.css
+│           └── router/            # React Router v6 route table
+└── package.json                   # npm workspaces root
 ```
 
-## Professional Development Outcomes
+## Known limitations
 
-Developing ArcadeFlow provided practical experience in constructing a full-stack distributed system. Key learning outcomes include managing real-time data flow with WebSockets, structuring a scalable React Native codebase, integrating third-party APIs (Firebase, Google AI), and designing user-centric interfaces. The utilization of AI assistance throughout the development cycle demonstrated proficiency in modern tooling to optimize productivity and resolve complex debugging scenarios.
+There's no automated test suite -- verification for this rebuild was a manual walkthrough of every nav tab and flow plus a production `vite build` to catch compile errors, not unit or integration tests. The "AR navigation" on the map screen is a directional placeholder (an arrow and a distance estimate), not real camera-based AR. Queue position progression is simulated client-side once a player joins (ticking down on a timer) rather than reflecting other real players actually being served, since there's no real arcade hardware in the loop to drive it. Firebase is optional at the code level -- the app falls back to mock data without it -- but that also means a backend running with no Firebase credentials configured will silently serve nothing real for any persisted data; it's not a bug your build will catch, but a "do I want to wire this up" decision.
 
-## Contributions
+## Credits
 
-- **Frontend UI/UX Design**: [Phalak Bhandari](https://www.behance.net/phalakbhandari1)
-- **Backend Architecture & API Integration**: [Swapnil](https://github.com/swapnil5053)
-
+UI/UX design by [Phalak Bhandari](https://www.behance.net/phalakbhandari1) — user flows, wireframes, usability testing, and design system.  
+Engineering by [Swapnil](https://github.com/swapnil5053) — frontend architecture, backend API, real-time queue system, and Firebase/Gem

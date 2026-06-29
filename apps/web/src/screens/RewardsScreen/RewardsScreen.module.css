@@ -1,0 +1,62 @@
+.screen {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--space-6) var(--space-4) calc(var(--navbar-height) + var(--space-8));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.back {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--color-surface-2); border: 1px solid var(--color-border);
+  color: var(--color-text); display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+.title { font-family: var(--font-display); font-size: 20px; margin: 0; }
+
+.xpCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.xpLabel { color: var(--color-text-sub); font-size: 12px; }
+.xpValue { font-family: var(--font-display); font-size: 26px; }
+
+.xpBar {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  overflow: hidden;
+}
+
+.xpFill {
+  height: 100%;
+  background: var(--color-primary);
+  transition: width var(--duration-slow) var(--ease-out);
+}
+
+.list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.rewardCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.rewardCard svg { color: var(--color-primary-light); flex-shrink: 0; }
+
+.rewardInfo { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.rewardTitle { font-weight: 600; font-size: 14px; }
+.rewardDesc { color: var(--color-text-sub); font-size: 12px; }
+.rewardCost { font-size: 12px; font-weight: 700; color: var(--color-primary-light); }

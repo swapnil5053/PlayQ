@@ -35,6 +35,8 @@ dist-ssr
 .env
 .env.*
 !.env.example
+firebase-service-account.json
+!firebase-service-account.json.example
 
 # SQLite database
 *.db

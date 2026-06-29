@@ -1,0 +1,103 @@
+.screen {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 100px;
+  background: var(--color-bg);
+}
+.topBar { display: flex; align-items: center; padding: 52px 16px 16px; gap: 8px; }
+.backBtn { background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+.title { font-family: var(--font-display); font-size: 20px; color: var(--color-text); margin: 0; }
+.section { padding: 0 16px 24px; }
+.sectionLabel {
+  font-family: var(--font-body); font-size: 12px; font-weight: 600;
+  color: var(--color-text-muted); text-transform: uppercase;
+  letter-spacing: 0.5px; margin: 0 0 12px;
+}
+.dateRow { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+.dateRow::-webkit-scrollbar { display: none; }
+.dateBtn {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 52px; padding: 10px 8px;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); cursor: pointer; flex-shrink: 0;
+  gap: 4px; transition: all 150ms ease;
+}
+.dateBtn.selected {
+  border-color: var(--color-accent); background: var(--color-accent-dim);
+}
+.dateDayName { font-size: 10px; color: var(--color-text-muted); font-family: var(--font-body); }
+.dateNum { font-family: var(--font-display); font-size: 18px; color: var(--color-text); }
+.dateBtn.selected .dateNum { color: var(--color-accent); }
+.timeGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.timeBtn {
+  padding: 14px; background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); color: var(--color-text); font-family: var(--font-body);
+  font-size: 14px; cursor: pointer; transition: all 150ms ease;
+}
+.timeBtn.selected {
+  border-color: var(--color-accent); background: var(--color-accent-dim);
+  color: var(--color-accent); font-weight: 600;
+}
+.typeRow { display: flex; gap: 8px; }
+.typeCard {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 14px 8px; background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); cursor: pointer; transition: all 150ms ease;
+}
+.typeCard.selected { border-color: var(--color-accent); background: var(--color-accent-dim); }
+.typeLabel { font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--color-text); }
+.typeSub { font-family: var(--font-body); font-size: 10px; color: var(--color-text-muted); }
+.gameList { display: flex; flex-direction: column; gap: 2px; }
+.gameRow {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); cursor: pointer; width: 100%;
+  transition: all 150ms ease; text-align: left;
+}
+.gameRow.gameSelected { border-color: var(--color-accent-border); }
+.gameName { flex: 1; font-family: var(--font-body); font-size: 14px; color: var(--color-text); }
+.gameWait { font-size: 12px; color: var(--color-text-muted); font-family: var(--font-body); }
+.checkbox {
+  width: 20px; height: 20px; border-radius: 4px; border: 1.5px solid var(--color-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--color-accent); flex-shrink: 0;
+  transition: all 150ms ease;
+}
+.checked { background: var(--color-accent); border-color: var(--color-accent); color: #0C0C0E; font-weight: 700; }
+.ctaWrap {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 390px; padding: 16px;
+  background: var(--color-bg); border-top: 1px solid var(--color-border);
+}
+.planBtn {
+  width: 100%; padding: 16px; background: var(--color-accent); border: none;
+  border-radius: var(--radius-lg); color: #0C0C0E; font-family: var(--font-body);
+  font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 150ms ease;
+}
+.planBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.successScreen {
+  min-height: 100%; background: var(--color-bg); display: flex;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px; gap: 12px; text-align: center;
+}
+.successIcon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--color-accent-dim); border: 1px solid var(--color-accent-border);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+}
+.successTitle { font-family: var(--font-display); font-size: 26px; color: var(--color-text); margin: 0; }
+.successSub { font-family: var(--font-body); font-size: 15px; color: var(--color-text-muted); margin: 0; }
+.plannedGames {
+  width: 100%; background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg); padding: 16px; margin-top: 8px; text-align: left;
+}
+.plannedLabel { font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px; font-family: var(--font-body); }
+.plannedGame { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border); font-family: var(--font-body); font-size: 14px; color: var(--color-text); }
+.plannedGame:last-child { border-bottom: none; }
+.plannedWait { font-size: 12px; color: var(--color-text-muted); }
+.doneBtn {
+  width: 100%; padding: 16px; background: var(--color-accent); border: none;
+  border-radius: var(--radius-lg); color: #0C0C0E; font-family: var(--font-body);
+  font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 16px;
+}

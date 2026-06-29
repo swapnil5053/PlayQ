@@ -1,21 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>THE ARCADE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Montserrat:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <title>The Arcade</title>
   </head>
   <body>
-    <div id="root">
-      <div style="display: flex; height: 100vh; width: 100vw; align-items: center; justify-content: center; background-color: #000; flex-direction: column; gap: 20px;">
-        <div style="width: 50px; height: 50px; border-radius: 50%; border: 4px solid rgba(255,0,255,0.2); border-top-color: #f0f; animation: spin 1s linear infinite; box-shadow: 0 0 20px rgba(255,0,255,0.5);"></div>
-        <div style="color: #f0f; font-family: sans-serif; font-weight: bold; letter-spacing: 2px; animation: pulse 1.5s ease-in-out infinite;">LOADING ARCADE...</div>
-        <style>
-          @keyframes spin { to { transform: rotate(360deg); } }
-          @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        </style>
-      </div>
-    </div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

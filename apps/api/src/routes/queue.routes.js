@@ -3,6 +3,7 @@ const router = express.Router();
 const { db, admin } = require('../services/firebaseAdmin');
 const verifyToken = require('../middleware/verifyToken');
 const verifyAdmin = require('../middleware/verifyAdmin');
+const { queues } = require('../socket/queueHandler');
 
 // Helper to calculate wait time
 const getWaitTime = async (gameId, queueLength) => {
@@ -16,34 +17,23 @@ const getWaitTime = async (gameId, queueLength) => {
 };
 
 // POST /api/queue/join
+// Reads the real in-memory queue (shared with the Socket.IO queueHandler) to
+// estimate this user's position. The actual queue membership is established
+// moments later when the frontend's useQueueSocket hook mounts and emits
+// `join_queue_room` -- that's what authoritatively pushes the entry and
+// drives all subsequent real-time `queue_updated` broadcasts.
 router.post('/join', verifyToken, async (req, res) => {
   try {
     const { gameId } = req.body;
     const userId = req.user.uid;
-    const displayName = req.user.name || 'Player';
 
-    const queueRef = db.collection('queues').doc(gameId).collection('entries');
-    
-    // Check if already in queue
-    const existing = await queueRef.where('userId', '==', userId).get();
-    if (!existing.empty) {
-      return res.status(409).json({ success: false, error: 'Already in queue' });
-    }
+    if (!queues[gameId]) queues[gameId] = [];
+    const queue = queues[gameId];
 
-    // Get current queue length
-    const allEntries = await queueRef.get();
-    const queueLength = allEntries.size + 1; // including new user
-    const position = queueLength; // newly joined goes to end
-
-    await queueRef.add({
-      userId,
-      displayName,
-      joinedAt: admin.firestore.FieldValue.serverTimestamp(),
-      status: 'waiting',
-      position
-    });
-
-    const estimatedWaitMinutes = await getWaitTime(gameId, queueLength);
+    const existingIndex = queue.findIndex((e) => e.userId === userId);
+    const position = existingIndex !== -1 ? existingIndex + 1 : queue.length + 1;
+    const queueLength = existingIndex !== -1 ? queue.length : queue.length + 1;
+    const estimatedWaitMinutes = Math.max(1, (position - 1) * 4);
 
     res.json({ success: true, data: { position, queueLength, estimatedWaitMinutes } });
   } catch (error) {
@@ -58,27 +48,20 @@ router.get('/:gameId', verifyToken, async (req, res) => {
     const { gameId } = req.params;
     const userId = req.user.uid;
 
-    const queueRef = db.collection('queues').doc(gameId).collection('entries');
-    const existing = await queueRef.where('userId', '==', userId).get();
-    
-    if (existing.empty) {
+    const queue = queues[gameId] || [];
+    const index = queue.findIndex((e) => e.userId === userId);
+
+    if (index === -1) {
       return res.status(404).json({ success: false, error: 'User not in queue' });
     }
 
-    const userEntry = existing.docs[0].data();
-    
-    const allEntries = await queueRef.get();
-    const queueLength = allEntries.size;
-    const estimatedWaitMinutes = await getWaitTime(gameId, userEntry.position);
+    const position = index + 1;
+    const queueLength = queue.length;
+    const estimatedWaitMinutes = Math.max(1, (position - 1) * 4);
 
-    res.json({ 
-      success: true, 
-      data: { 
-        position: userEntry.position, 
-        queueLength, 
-        estimatedWaitMinutes, 
-        status: userEntry.status 
-      } 
+    res.json({
+      success: true,
+      data: { position, queueLength, estimatedWaitMinutes, status: 'waiting' }
     });
   } catch (error) {
     console.error('Error getting queue status:', error);
@@ -92,27 +75,9 @@ router.post('/leave', verifyToken, async (req, res) => {
     const { gameId } = req.body;
     const userId = req.user.uid;
 
-    const queueRef = db.collection('queues').doc(gameId).collection('entries');
-    const existing = await queueRef.where('userId', '==', userId).get();
-
-    if (existing.empty) {
-      return res.json({ success: true, message: 'Not in queue' });
-    }
-
-    const docToDelete = existing.docs[0];
-    const leftPosition = docToDelete.data().position;
-
-    // Batch to delete and update positions
-    const batch = db.batch();
-    batch.delete(docToDelete.ref);
-
-    // Get all others to recalculate
-    const others = await queueRef.where('position', '>', leftPosition).get();
-    others.docs.forEach(doc => {
-      batch.update(doc.ref, { position: doc.data().position - 1 });
-    });
-
-    await batch.commit();
+    const queue = queues[gameId] || [];
+    const idx = queue.findIndex((e) => e.userId === userId);
+    if (idx !== -1) queue.splice(idx, 1);
 
     res.json({ success: true });
   } catch (error) {

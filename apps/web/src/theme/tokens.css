@@ -1,0 +1,140 @@
+:root {
+  /* Surfaces -- deep indigo-black, matches the studio's style guide */
+  --color-bg:           #0A0A12;
+  --color-surface:      #14141F;
+  --color-surface-2:    #1C1C2C;
+  --color-border:       rgba(255, 255, 255, 0.07);
+  --color-border-hover: rgba(255, 255, 255, 0.14);
+
+  /* Accent -- muted iris/plum violet (deliberately desaturated to avoid the
+     neon "AI gradient" purple look). Used on: active nav tab, primary CTA
+     buttons, position badge, active filter pill, score display, brand mark. */
+  --color-accent:        #6C5BA8;
+  --color-accent-dim:    rgba(108, 91, 168, 0.15);
+  --color-accent-border: rgba(108, 91, 168, 0.35);
+
+  /* Kept as aliases so existing references resolve to the same accent */
+  --color-primary:       #6C5BA8;
+  --color-primary-mid:   #8779C2;
+  --color-primary-light: #ABA0D9;
+  --color-primary-glow:  rgba(108, 91, 168, 0.18);
+
+  /* Semantic colors */
+  --color-success:      #22C55E;
+  --color-warning:      #EAB308;
+  --color-danger:       #EF4444;
+  --color-info:         #38BDF8;
+
+  /* Wait time color coding */
+  --color-wait-low:     #22C55E;
+  --color-wait-mid:     #6C5BA8;
+  --color-wait-high:    #EF4444;
+
+  /* Text -- cool off-white */
+  --color-text:         #F2F2F8;
+  --color-text-sub:     #9999AD;
+  --color-text-muted:   #5C5C73;
+
+  /* Typography */
+  --font-display: 'Archivo Black', sans-serif;
+  --font-body:    'Montserrat', sans-serif;
+  --font-pixel:   'Press Start 2P', 'Archivo Black', sans-serif;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Border radius */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card:  0 1px 8px rgba(0, 0, 0, 0.5);
+  --shadow-glow:  0 0 20px rgba(108, 91, 168, 0.2);
+  --shadow-modal: 0 -8px 40px rgba(0, 0, 0, 0.7);
+
+  /* Transitions */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 130ms;
+  --duration-base: 220ms;
+  --duration-slow: 400ms;
+
+  /* Layout */
+  --navbar-height: 64px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  background-color: var(--color-bg);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: var(--font-body);
+}
+
+input, select, textarea {
+  font-family: var(--font-body);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-hover);
+  border-radius: var(--radius-full);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+@keyframes scale-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(220px) rotate(360deg); opacity: 0; }
+}
+
+@keyframes toast-in {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}

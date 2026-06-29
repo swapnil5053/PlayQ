@@ -1,0 +1,28 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.positionPill {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-full);
+}
+
+.estimate {
+  color: var(--color-text-sub);
+  font-size: 13px;
+  margin: 0;
+}
+
+.almost {
+  color: var(--color-success);
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0;
+}

@@ -1,0 +1,68 @@
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #1f2937 0%, #0A0A12 70%);
+  border: 1px solid var(--color-border);
+}
+
+.ghostSvg {
+  display: block;
+}
+
+.ghostBody rect {
+  fill: #22C55E;
+}
+
+.eye {
+  fill: #0A0A12;
+}
+
+.pupil {
+  fill: #ffffff;
+}
+
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-pixel);
+  line-height: 1.4;
+}
+
+.the {
+  color: var(--color-text-sub);
+  letter-spacing: 0.25em;
+}
+
+.arcade {
+  background: linear-gradient(90deg, var(--color-primary-light), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* size variants */
+.sm .badge { width: 40px; height: 40px; }
+.sm .ghostSvg { width: 22px; height: 22px; }
+.sm .the { font-size: 8px; }
+.sm .arcade { font-size: 14px; }
+
+.md .badge { width: 56px; height: 56px; }
+.md .ghostSvg { width: 32px; height: 32px; }
+.md .the { font-size: 10px; }
+.md .arcade { font-size: 18px; }
+
+.lg .badge { width: 80px; height: 80px; }
+.lg .ghostSvg { width: 46px; height: 46px; }
+.lg .the { font-size: 11px; }
+.lg .arcade { font-size: 24px; }

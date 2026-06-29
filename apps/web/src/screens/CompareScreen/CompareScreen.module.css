@@ -1,0 +1,63 @@
+.screen {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--space-6) var(--space-4) calc(var(--navbar-height) + var(--space-8));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.context {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  margin: 0;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin: 0;
+}
+
+.select {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  font-size: 14px;
+}
+
+.compareRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.card {
+  flex: 1;
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.youCard { background: var(--color-surface-2); border: 1px solid var(--color-primary-glow); color: var(--color-text); }
+.friendCard { background: var(--color-surface-2); border: 1px solid var(--color-border); }
+
+.cardLabel { font-size: 12px; opacity: 0.85; }
+.cardScore { font-family: var(--font-display); font-size: 22px; }
+
+.diff {
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.diffUp { color: var(--color-success); }
+.diffDown { color: var(--color-danger); }

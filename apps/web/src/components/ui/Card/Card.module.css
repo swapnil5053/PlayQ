@@ -1,0 +1,23 @@
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+}
+
+.padded {
+  padding: var(--space-4);
+}
+
+.pressable {
+  cursor: pointer;
+}
+
+.pressable:hover {
+  border-color: var(--color-border-hover);
+}
+
+.pressable:active {
+  transform: scale(0.98);
+}

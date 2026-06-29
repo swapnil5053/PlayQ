@@ -1,0 +1,96 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--space-3) 0;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.card:last-child { border-bottom: none; }
+.card:active { background: var(--color-surface-2); }
+.card:hover { background: var(--color-surface-2); }
+
+.thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.tags {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.chevron {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.heroCard {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.heroCard:active { transform: scale(0.98); }
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: linear-gradient(to top, rgba(12,12,14,0.92) 0%, rgba(12,12,14,0.45) 45%, transparent 80%);
+}
+
+.heroBadges {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.heroName {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0;
+  color: #fff;
+}

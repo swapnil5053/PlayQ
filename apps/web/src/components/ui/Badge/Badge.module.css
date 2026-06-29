@@ -1,0 +1,26 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-surface-2);
+  color: var(--color-text-sub);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.easy {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+}
+
+.medium {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning);
+}
+
+.hard {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-danger);
+}
